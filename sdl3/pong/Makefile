@@ -26,6 +26,8 @@ clean:
 .PHONY: all clean start
 
 start:
+	rm -rf build
+	mkdir -p build
 	cd build && cmake ..
 	cd build && $(MAKE)
 	cd build && ./main.bin
