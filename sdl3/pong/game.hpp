@@ -26,6 +26,7 @@ private:
 
     Entity* player;
     Entity* ball;
+    Entity* background;
 
     void resetBall();
 

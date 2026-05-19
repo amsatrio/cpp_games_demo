@@ -27,9 +27,10 @@ bool Game::init(const char *title, int width, int height) {
     }
 
     sprite_sheet = IMG_LoadTexture(renderer, "assets/img/sprite-sheet.png");
-    player = new Entity(sprite_sheet, 32, 0, 32, 32, 100, screen_height - 100, 128, 16, 100);
-    ball = new Entity(sprite_sheet, 0, 0, 32, 32, screen_width / 2.0f, 100.0f,
+    player = new Entity(sprite_sheet, 0, 0, 16, 16, 100, screen_height - 100, 128, 16, 100);
+    ball = new Entity(sprite_sheet, 16, 0, 16, 16, screen_width / 2.0f, 100.0f,
                       24, 24, 200);
+    background = new Entity(sprite_sheet, 32, 0, 16, 16, 0, 0, screen_width, screen_height, 0);
 
     isRunning = true;
     return true;
@@ -84,7 +85,7 @@ void Game::update(float dt) {
     if (ball->y + ball->h > screen_height)
         current_state = GameState::GAME_OVER;
 
-    // Paddle Collision
+    // Paddle ball Collision
     SDL_FRect pRect = player->getRect();
     SDL_FRect bRect = ball->getRect();
     if (SDL_HasRectIntersectionFloat(&pRect, &bRect) && ball->dy > 0) {
@@ -96,6 +97,8 @@ void Game::update(float dt) {
 void Game::render() {
     SDL_SetRenderDrawColor(renderer, 33, 33, 33, 255);
     SDL_RenderClear(renderer);
+
+    background->draw(renderer);
 
     if (current_state == GameState::START || current_state == GameState::PAUSE) {
         player->draw(renderer);
