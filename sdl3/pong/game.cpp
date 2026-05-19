@@ -2,8 +2,9 @@
 #include <SDL3_image/SDL_image.h>
 #include <algorithm>
 
-Game::Game() : window(nullptr), renderer(nullptr), isRunning(false), 
-               currentState(GameState::START), player(nullptr), ball(nullptr) {}
+Game::Game()
+    : window(nullptr), renderer(nullptr), isRunning(false),
+      current_state(GameState::START), player(nullptr), ball(nullptr) {}
 
 Game::~Game() {
     delete player;
@@ -13,25 +14,29 @@ Game::~Game() {
     SDL_Quit();
 }
 
-bool Game::init(const char* title, int width, int height) {
-    if (!SDL_Init(SDL_INIT_VIDEO)) return false;
+bool Game::init(const char *title, int width, int height) {
+    if (!SDL_Init(SDL_INIT_VIDEO))
+        return false;
 
-    screenWidth = width;
-    screenHeight = height;
+    screen_width = width;
+    screen_height = height;
 
-    if (!SDL_CreateWindowAndRenderer(title, width, height, 0, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer(title, width, height, 0, &window,
+                                     &renderer)) {
         return false;
     }
 
-    player = new Entity(renderer, "assets/img/paddle.png", 100, 400, 128, 16, 100);
-    ball = new Entity(renderer, "assets/img/ball.png", 100, 200, 24, 24, 200);
+    sprite_sheet = IMG_LoadTexture(renderer, "assets/img/sprite-sheet.png");
+    player = new Entity(sprite_sheet, 32, 0, 32, 32, 100, screen_height - 100, 128, 16, 100);
+    ball = new Entity(sprite_sheet, 0, 0, 32, 32, screen_width / 2.0f, 100.0f,
+                      24, 24, 200);
 
     isRunning = true;
     return true;
 }
 
 void Game::resetBall() {
-    ball->x = screenWidth / 2.0f;
+    ball->x = screen_width / 2.0f;
     ball->y = 100.0f;
     ball->dx = 1.0f;
     ball->dy = 1.0f;
@@ -40,32 +45,44 @@ void Game::resetBall() {
 void Game::handleEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_EVENT_QUIT) isRunning = false;
-        
-        if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_SPACE) {
-            if (currentState != GameState::PLAYING) {
+        if (event.type == SDL_EVENT_QUIT)
+            isRunning = false;
+
+        if (event.type == SDL_EVENT_KEY_DOWN &&
+            event.key.scancode == SDL_SCANCODE_SPACE) {
+            if (current_state == GameState::START || current_state == GameState::GAME_OVER) {
                 resetBall();
-                currentState = GameState::PLAYING;
+                current_state = GameState::PLAYING;
+            } else if (current_state == GameState::PLAYING) {
+                current_state = GameState::PAUSE;
+            } else if (current_state == GameState::PAUSE) {
+                current_state = GameState::PLAYING;
             }
         }
     }
 
-    const bool* keys = SDL_GetKeyboardState(NULL);
+    const bool *keys = SDL_GetKeyboardState(NULL);
     float dt = 0.016f;
-    if (keys[SDL_SCANCODE_LEFT]) player->x -= player->speed * dt;
-    if (keys[SDL_SCANCODE_RIGHT]) player->x += player->speed * dt;
+    if (keys[SDL_SCANCODE_LEFT])
+        player->x -= player->speed * dt;
+    if (keys[SDL_SCANCODE_RIGHT])
+        player->x += player->speed * dt;
 }
 
 void Game::update(float dt) {
-    if (currentState != GameState::PLAYING) return;
+    if (current_state != GameState::PLAYING)
+        return;
 
     ball->x += ball->dx * ball->speed * dt;
     ball->y += ball->dy * ball->speed * dt;
 
     // Boundary Collisions
-    if (ball->x < 0 || ball->x + ball->w > screenWidth) ball->dx *= -1;
-    if (ball->y < 0) ball->dy *= -1;
-    if (ball->y + ball->h > screenHeight) currentState = GameState::GAME_OVER;
+    if (ball->x < 0 || ball->x + ball->w > screen_width)
+        ball->dx *= -1;
+    if (ball->y < 0)
+        ball->dy *= -1;
+    if (ball->y + ball->h > screen_height)
+        current_state = GameState::GAME_OVER;
 
     // Paddle Collision
     SDL_FRect pRect = player->getRect();
@@ -75,13 +92,18 @@ void Game::update(float dt) {
         ball->y = player->y - ball->h;
     }
 }
- 
+
 void Game::render() {
     SDL_SetRenderDrawColor(renderer, 33, 33, 33, 255);
     SDL_RenderClear(renderer);
 
-    player->draw(renderer);
-    ball->draw(renderer);
+    if (current_state == GameState::START || current_state == GameState::PAUSE) {
+        player->draw(renderer);
+        ball->draw(renderer);
+    } else if (current_state == GameState::PLAYING) {
+        player->draw(renderer);
+        ball->draw(renderer);
+    }
 
     SDL_RenderPresent(renderer);
 }

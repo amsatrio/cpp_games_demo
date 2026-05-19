@@ -4,7 +4,7 @@
 #include <SDL3/SDL.h>
 #include "entity.hpp"
 
-enum class GameState { START, PLAYING, GAME_OVER };
+enum class GameState { START, PLAYING, PAUSE, GAME_OVER };
 
 class Game {
 public:
@@ -21,13 +21,15 @@ private:
     SDL_Window* window;
     SDL_Renderer* renderer;
     bool isRunning;
-    GameState currentState;
-    int screenWidth, screenHeight;
+    GameState current_state;
+    int screen_width, screen_height;
 
     Entity* player;
     Entity* ball;
 
     void resetBall();
+
+    SDL_Texture* sprite_sheet;
 };
 
 #endif
