@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
 
 int init() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("SDL_Init Error: %s", SDL_GetError());
         return 1;
     }
 
@@ -48,6 +49,7 @@ int init() {
     const int screen_height = 480;
 
     if (!SDL_CreateWindowAndRenderer("SDL3 Basic Window", screen_width, screen_height, 0, &state.window, &state.renderer)) {
+        SDL_Log("Window Creation Error: %s", SDL_GetError());
         SDL_Quit();
         return 1;
     }
