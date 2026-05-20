@@ -64,9 +64,9 @@ void Game::handleEvents() {
 
     const bool *keys = SDL_GetKeyboardState(NULL);
     float dt = 0.016f;
-    if (keys[SDL_SCANCODE_LEFT])
+    if (keys[SDL_SCANCODE_LEFT] && player->x > 0)
         player->x -= player->speed * dt;
-    if (keys[SDL_SCANCODE_RIGHT])
+    if (keys[SDL_SCANCODE_RIGHT] && player->x + player->w < screen_width)
         player->x += player->speed * dt;
 }
 
