@@ -78,7 +78,7 @@ void Game::update(float dt) {
     ball->y += ball->dy * ball->speed * dt;
 
     // Boundary Collisions
-    if (ball->x < 0 || ball->x + ball->w > screen_width)
+    if (ball->x <= 0 || ball->x + ball->w >= screen_width)
         ball->dx *= -1;
     if (ball->y < 0)
         ball->dy *= -1;
