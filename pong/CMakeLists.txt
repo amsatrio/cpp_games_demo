@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(SDL3_Breakout VERSION 1.0 LANGUAGES CXX)
+project(SDL3_Pong VERSION 1.0 LANGUAGES CXX)
 
 # Use C++23 as requested
 set(CMAKE_CXX_STANDARD 23)

@@ -9,6 +9,8 @@ Game::Game()
 Game::~Game() {
     delete player;
     delete ball;
+    delete background;
+    SDL_DestroyTexture(sprite_sheet);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -27,7 +29,7 @@ bool Game::init(const char *title, int width, int height) {
     }
 
     sprite_sheet = IMG_LoadTexture(renderer, "assets/img/sprite-sheet.png");
-    player = new Entity(sprite_sheet, 0, 0, 16, 16, 100, screen_height - 100, 128, 16, 100);
+    player = new Entity(sprite_sheet, 0, 0, 16, 16, 100, screen_height - 100, 128, 16, 1000);
     ball = new Entity(sprite_sheet, 16, 0, 16, 16, screen_width / 2.0f, 100.0f,
                       24, 24, 200);
     background = new Entity(sprite_sheet, 32, 0, 16, 16, 0, 0, screen_width, screen_height, 0);
@@ -43,7 +45,7 @@ void Game::resetBall() {
     ball->dy = 1.0f;
 }
 
-void Game::handleEvents() {
+void Game::handleEvents(float dt) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_EVENT_QUIT)
@@ -63,7 +65,6 @@ void Game::handleEvents() {
     }
 
     const bool *keys = SDL_GetKeyboardState(NULL);
-    float dt = 0.016f;
     if (keys[SDL_SCANCODE_LEFT] && player->x > 0)
         player->x -= player->speed * dt;
     if (keys[SDL_SCANCODE_RIGHT] && player->x + player->w < screen_width)
@@ -99,14 +100,8 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
     background->draw(renderer);
-
-    if (current_state == GameState::START || current_state == GameState::PAUSE) {
-        player->draw(renderer);
-        ball->draw(renderer);
-    } else if (current_state == GameState::PLAYING) {
-        player->draw(renderer);
-        ball->draw(renderer);
-    }
+    player->draw(renderer);
+    ball->draw(renderer);
 
     SDL_RenderPresent(renderer);
 }
@@ -118,7 +113,7 @@ void Game::run() {
         float dt = std::min((currentTime - lastTime) / 1000.0f, 0.1f);
         lastTime = currentTime;
 
-        handleEvents();
+        handleEvents(dt);
         update(dt);
         render();
     }

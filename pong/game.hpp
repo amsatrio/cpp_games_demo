@@ -13,7 +13,7 @@ public:
 
     bool init(const char* title, int width, int height);
     void run();
-    void handleEvents();
+    void handleEvents(float dt);
     void update(float deltaTime);
     void render();
 

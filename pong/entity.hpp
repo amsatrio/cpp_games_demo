@@ -15,9 +15,8 @@ class Entity {
     void draw(SDL_Renderer *renderer);
     SDL_FRect getRect() const { return {x, y, w, h}; }
   private:
-    SDL_Texture *texture;
     SDL_FRect src_rect;
-      
+    SDL_Texture *texture;
 };
 
 #endif
